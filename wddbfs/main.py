@@ -26,17 +26,50 @@ _logger = util.get_module_logger(__name__)
 BUFFER_SIZE = 8192
 
 
+class TableFormatter:
+    def _fetch_query(self, query: str, connection: sqlite3.Connection) -> pd.DataFrame:
+        cursor = connection.execute(query)
+        columns = [d[0] for d in cursor.description]
+        result = cursor.fetchall()
+        if not isinstance(result, list):
+            result = list(result)
+        df = pd.io.sql._wrap_result(result, columns=columns)
+        return df
+
+    def __call__(self, query: str, connection: sqlite3.Connection, output: io.BytesIO):
+        return
+
+
+class CSVFormatter(TableFormatter):
+    def __init__(self, **csv_kwargs):
+        self.csv_kwargs = csv_kwargs
+
+    def __call__(self, query: str, connection: sqlite3.Connection, output: io.BytesIO):
+        df = self._fetch_query(query=query, connection=connection)
+        df.to_csv(output, index=False, **self.csv_kwargs)
+
+
+class JSONFormatter(TableFormatter):
+    def __call__(self, query: str, connection: sqlite3.Connection, output: io.BytesIO):
+        df = self._fetch_query(query=query, connection=connection)
+        df.to_json(output, orient="records")
+
+
+class JSONLFormatter(TableFormatter):
+    def __call__(self, query: str, connection: sqlite3.Connection, output: io.BytesIO):
+        df = self._fetch_query(query=query, connection=connection)
+        output.write(
+            "\n".join([json.dumps(r.to_dict()) for _, r in df.iterrows()]).encode(
+                "utf8"
+            )
+        )
+
+
 TABLE_FORMATTERS = {
-    ".csv": lambda q, con, o: pd.read_sql_query(q, con).to_csv(o, index=False),
-    ".tsv": lambda q, con, o: pd.read_sql_query(q, con).to_csv(
-        o, sep="\t", index=False
-    ),
-    ".json": lambda q, con, o: pd.read_sql_query(q, con).to_json(o, orient="records"),
-    ".jsonl": lambda q, con, o: o.write(
-        "\n".join(
-            [json.dumps(r.to_dict()) for _, r in pd.read_sql_query(q, con).iterrows()]
-        ).encode("utf8")
-    ),
+    ".csv": CSVFormatter(),
+    ".tsv": CSVFormatter(sep="\t"),
+    ".json": JSONFormatter(),
+    ".jsonl": JSONLFormatter(),
 }
 
 
