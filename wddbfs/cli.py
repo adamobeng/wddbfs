@@ -5,6 +5,7 @@ import configargparse
 
 import wddbfs.main
 
+
 def cli():
     p = configargparse.ArgParser(default_config_files=[])
     p.add(
@@ -13,7 +14,9 @@ def cli():
     p.add("--host", required=False, default="127.0.0.1")
     p.add("--port", required=False, default="8080")
     p.add("--log-level", required=False, default="ERROR")
-    p.add("--formats", required=False, default=list(wddbfs.main.TABLE_FORMATTERS.keys()))
+    p.add(
+        "--formats", required=False, default=list(wddbfs.main.TABLE_FORMATTERS.keys())
+    )
     p.add("--timeout", required=False, default=0.250)
     p.add(
         "--anonymous", action="store_true", help="allow access without authentication"
@@ -21,7 +24,16 @@ def cli():
     p.add("--username", help="")
     p.add("--password", help="")
     p.add("--db-path", nargs="+", help="paths to sqlite database files")
-    p.add("--allow-abspath", action="store_true", required=False, default=False, help="make it possible to access any database on the host filesystem by specifying its absolute path relative to the WebDAV root (e.g. /mount/webdav/absolute/path/on/host/fs/to/db.sqlite) ")
+    p.add(
+        "--allow-abspath",
+        action="store_true",
+        required=False,
+        default=False,
+        help=(
+            "make it possible to access any database on the host filesystem by specifying its absolute path relative to the "
+            "WebDAV root (e.g. /mount/webdav/absolute/path/on/host/fs/to/db.sqlite)"
+        ),
+    )
 
     options = p.parse_args()
 

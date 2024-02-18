@@ -13,12 +13,7 @@ import io
 from urllib.parse import quote
 
 from wsgidav import util
-from wsgidav.dav_error import (
-    HTTP_FORBIDDEN,
-    HTTP_INTERNAL_ERROR,
-    DAVError,
-    PRECONDITION_CODE_ProtectedProperty,
-)
+
 from wsgidav.dav_provider import DAVCollection, DAVNonCollection, DAVProvider
 from wsgidav.util import join_uri
 import sqlite3
@@ -102,7 +97,9 @@ class RootCollection(DAVCollection):
                 resource_provider=self.resource_provider,
                 formats=self.formats,
             )
-        elif self.resource_provider.allow_abspath and os.path.exists(join_uri("/", name)):
+        elif self.resource_provider.allow_abspath and os.path.exists(
+            join_uri("/", name)
+        ):
             return PathCollection(
                 join_uri("/", name),
                 self.environ,
@@ -226,10 +223,12 @@ class DBResourceProvider(DAVProvider):
     DAV provider that serves a VirtualResource derived structure.
     """
 
-    def __init__(self, db_paths=[], formats=TABLE_FORMATTERS.keys(), allow_abspath=False):
+    def __init__(
+        self, db_paths=[], formats=TABLE_FORMATTERS.keys(), allow_abspath=False
+    ):
         self.formats = formats
         self.db_paths = db_paths
-        self.allow_abspath=allow_abspath
+        self.allow_abspath = allow_abspath
         super().__init__()
         db_names = self.dbs
         assert (len(db_names)) == len(set(db_names)), "database names must be unique"
@@ -279,4 +278,3 @@ class DB:
         TABLE_FORMATTERS[format](query, self.con, o)
         o.seek(0)
         return o
-
