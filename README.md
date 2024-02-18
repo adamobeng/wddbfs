@@ -1,3 +1,5 @@
+![example workflow](https://github.com/adamobeng/wddbfs/actions/workflows/python-app.yml/badge.svg)
+
 wddbfs is a Python package which implements webdavfs that exposes the contents of sqlite databases to the filesystem
 
 # Installation
