@@ -9,4 +9,5 @@ setup(
         "console_scripts": ["wddbfs=wddbfs.cli:cli"],
     },
     packages=['wddbfs'] ,
+    license_files = ('LICENSE',),
 )
