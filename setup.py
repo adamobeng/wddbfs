@@ -10,4 +10,10 @@ setup(
     },
     packages=['wddbfs'] ,
     license_files = ('LICENSE',),
+    install_requires=[
+        'cheroot',
+        'wsgidav',
+        'configargparse',
+        'pandas',
+    ],
 )
