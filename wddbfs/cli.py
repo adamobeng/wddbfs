@@ -20,7 +20,8 @@ def cli():
     )
     p.add("--username", help="")
     p.add("--password", help="")
-    p.add("--db_path", nargs="+", help="paths to sqlite database files")
+    p.add("--db-path", nargs="+", help="paths to sqlite database files")
+    p.add("--allow-abspath", action="store_true", required=False, default=False, help="make it possible to access any database on the host filesystem by specifying its absolute path relative to the WebDAV root (e.g. /mount/webdav/absolute/path/on/host/fs/to/db.sqlite) ")
 
     options = p.parse_args()
 
@@ -49,6 +50,7 @@ def cli():
             "/": wddbfs.main.DBResourceProvider(
                 db_paths=options.db_path or [],
                 formats=options.formats,
+                allow_abspath=options.allow_abspath,
             ),
         },
         "simple_dc": {"user_mapping": user_mapping},
